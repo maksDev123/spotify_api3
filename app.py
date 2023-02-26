@@ -43,5 +43,3 @@ def get_token():
     token = json_result["access_token"]
 
     return token
-
-print(get_token())
