@@ -16,7 +16,7 @@ Type in name of artist
 ## Errors handling
 If error will occur than appropriate message will be shown
 
-For example if you type in #################
+For example if you type in ################# in filed with artist name
 This message will be shown
 
 ![image](https://user-images.githubusercontent.com/116755445/221674144-2edceabe-1f08-433c-84a6-c27abba565cc.png)
