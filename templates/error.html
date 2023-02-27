@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <style>
+
+
+        body {
+            background-color: rgb(218, 202, 141);
+        }
+
+        .heading {
+            color: #665000;
+            text-align: center;
+            font-family: "Monaco", "Courier New", monospace;
+        }
+        .button {
+            font-family: "Monaco", "Courier New", monospace;
+            -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    border: 1px;
+    text-decoration: none;
+    color: initial;
+    display: inline-flex;
+  align-items: center; 
+  text-align: center;
+  color: #fff;
+  width: 100px;
+            height: 50px;
+            background: #665000;
+            border-radius: 20px;
+            border: 0.15rem solid #000000;;
+        }
+        .form_align {
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">Error: We can not find artist with name - {{ artist }}</h1>
+    <div class="form_align">
+            <a class="button" href="http://127.0.0.1:5000/">Search again</a>
+
+    </div>
+</body>
+
+</html>

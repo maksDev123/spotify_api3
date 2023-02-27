@@ -5,13 +5,11 @@ Spotify api
 import json
 import os
 import base64
+import pandas as pd
 from dotenv import load_dotenv
 import requests
-import pycountry
 from flask import Flask, render_template, request
 import folium
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
 
 saved_data = {}
 
@@ -21,6 +19,8 @@ load_dotenv()
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
+countries = pd.read_csv('countries.csv')
+
 
 def get_auth_header(token):
     """
@@ -112,44 +112,40 @@ def search_form():
 
 @app.route("/search")
 def search_markets():
+
     """ Endpoint for map """
     # Get token
     token = get_token()
 
     # Get artist json object and id
     artist_name = request.args.get('artist')
-    atrist_id = search_artist(token, artist_name)["artists"]["items"][0]["id"]
+    atrist = None
+    try:
+        atrist = search_artist(token, artist_name)["artists"]["items"][0]
+    except (KeyError, IndexError):
+        return render_template("error.html", artist = artist_name)
 
     # Get top track and available markets
-    track = top_track(atrist_id, token)[0]
+    track = top_track(atrist["id"], token)[0]
     markets = get_markets(track["id"], token)
 
     # Create map
     map = folium.Map()
     folium_g = folium.FeatureGroup(name=track["name"])
-    geolocator = Nominatim(user_agent="map_search.py")
-    geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
-    for _, country_name in enumerate(markets):
-        if country_name not in saved_data:
-            try:
-                country = pycountry.countries.get(alpha_2=country_name).name
-                print(country_name)
-                try:
-                    location = geocode(country)
-                except:
-                    continue
-                saved_data[country_name] = [(location.latitude, location.longitude), country]
-            except AttributeError:
-                continue
-        # print(saved_data)
-        folium_g.add_child(folium.Marker(location=[saved_data[country_name][0][0],
-                                                    saved_data[country_name][0][1]],
-                            popup=country_name[1],
-                            icon=folium.Icon()))
+
+    for _, country_code in enumerate(markets):
+        country = countries.loc[countries['ISO 3166 Country Code'] == country_code].to_dict("list")
+        if country["Country"]:
+            folium_g.add_child(folium.Marker(location=[country["Latitude"][0],
+                                                        country["Longitude"][0]],
+                                popup=country["Country"][0],
+                                icon=folium.Icon()))
 
     map.add_child(folium_g)
     map.add_child(folium.LayerControl())
-    return ("<a target='_blank' style='background-color: #f44336;\
+    return ("<div>"+"<a target='_blank' style='background-color: #f44336;\
                color: white;padding: 14px 25px;text-align:center;\
                text-decoration:none;display: inline-block;' href='http://127.0.0.1:5000/'>Back</a>"+
+               "<h1 style='font-family:verdana; color: #665000; text-align: center; f'>"+
+               "Artist - "+atrist["name"]+" Song - "+track["name"]+"</h1>"+"</div>"+
                map.get_root().render())
